@@ -1,3 +1,5 @@
+//This is a test for middleware changes
+
 import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
 
 const isPublicRoute = createRouteMatcher([
