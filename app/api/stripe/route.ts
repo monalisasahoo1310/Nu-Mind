@@ -1,4 +1,4 @@
-import { auth, currentUser } from "@clerk/nextjs";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 
 import prismadb from "@/lib/prismadb";
@@ -28,7 +28,9 @@ export async function GET() {
         return_url: settingsUrl,
       });
 
-      return new NextResponse(JSON.stringify({ url: stripeSession.url }), { status: 200 });
+      return new NextResponse(JSON.stringify({ url: stripeSession.url }), {
+        status: 200,
+      });
     }
 
     const stripeSession = await stripe.checkout.sessions.create({
@@ -59,7 +61,9 @@ export async function GET() {
       },
     });
 
-    return new NextResponse(JSON.stringify({ url: stripeSession.url }), { status: 200 });
+    return new NextResponse(JSON.stringify({ url: stripeSession.url }), {
+      status: 200,
+    });
   } catch (error) {
     console.log("[STRIPE_ERROR]", error);
     return new NextResponse("Internal Server Error", { status: 500 });
