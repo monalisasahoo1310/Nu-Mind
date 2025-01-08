@@ -1,7 +1,5 @@
-"use client";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-
 import prismadb from "@/lib/prismadb";
 import { stripe } from "@/lib/stripe";
 import { absoluteUrl } from "@/lib/utils";
@@ -16,24 +14,18 @@ export async function GET() {
     if (!userId || !user) {
       return new NextResponse("Unauthorized", { status: 401 });
     }
-
     const userSubscription = await prismadb.userSubscription.findUnique({
       where: {
         userId,
       },
     });
-
     if (userSubscription && userSubscription.stripeCustomerId) {
       const stripeSession = await stripe.billingPortal.sessions.create({
         customer: userSubscription.stripeCustomerId,
         return_url: settingsUrl,
       });
-
-      return new NextResponse(JSON.stringify({ url: stripeSession.url }), {
-        status: 200,
-      });
+      return new NextResponse(JSON.stringify({ url: stripeSession.url }));
     }
-
     const stripeSession = await stripe.checkout.sessions.create({
       success_url: settingsUrl,
       cancel_url: settingsUrl,
@@ -46,8 +38,8 @@ export async function GET() {
           price_data: {
             currency: "USD",
             product_data: {
-              name: "Prometheus Pro",
-              description: "Prometheus Pro",
+              name: "Nu-Mind Pro",
+              description: "Unlimited Access to Nu-Mind",
             },
             unit_amount: 2000,
             recurring: {
@@ -61,12 +53,9 @@ export async function GET() {
         userId,
       },
     });
-
-    return new NextResponse(JSON.stringify({ url: stripeSession.url }), {
-      status: 200,
-    });
+    return new NextResponse(JSON.stringify({ url: stripeSession.url }));
   } catch (error) {
     console.log("[STRIPE_ERROR]", error);
-    return new NextResponse("Internal Server Error", { status: 500 });
+    return new NextResponse("Internal error", { status: 500 });
   }
 }
